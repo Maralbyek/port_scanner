@@ -1,6 +1,6 @@
 import socket
 
-print("=== Beginner Port Scanner ===")
+print("Beginner Port Scanner")
 
 target = input("Enter target IP or domain: ")
 
