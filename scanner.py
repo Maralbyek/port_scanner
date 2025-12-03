@@ -24,16 +24,21 @@ print("Port Scanner with Service Detection")
 print("=" * 50)
 
 target = input("Enter target IP or domain: ")
+print(f"\nScanning {target}...\n")
+
+open ports = []
+
 for port in range(1, 101):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(0.5)
-
-    result = sock.connect_ex((target, port))
+     result = sock.connect_ex((target, port))
 
     if result == 0:
-        print(f"[+] Port {port} is OPEN")
+         service = PORT_SERVICES.get(port, "Unknown Service")
+        print(f"[+] Port {port:5d} is OPEN | Service: {service}")
+        open_ports.append(port)
     else:
-        print(f"[-] Port {port} is closed")
+        print(f"[-] Port {port} is closed thus try again.")
 
     sock.close()
 
