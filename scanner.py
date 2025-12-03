@@ -4,7 +4,6 @@ from datetime import datetime
 import sys
 
 def threaded_scan(target, port, results):
-    """Scan a single port (used in threads)"""
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(1)
@@ -16,7 +15,6 @@ def threaded_scan(target, port, results):
         pass
 
 def fast_scan(target, port_range):
-    """Scan multiple ports using threads"""
     print(f"[*] Starting fast scan on {target}")
     threads = []
     results = []
@@ -32,7 +30,6 @@ def fast_scan(target, port_range):
     return sorted(results)
 
 def grab_banner(target, port):
-    """Try to grab service banner"""
     try:
         sock = socket.socket()
         sock.settimeout(2)
@@ -45,7 +42,6 @@ def grab_banner(target, port):
         return "No banner"
 
 def detect_service(target, port):
-    """Detect service running on port"""
     try:
         sock = socket.socket()
         sock.settimeout(1)
@@ -62,7 +58,6 @@ def detect_service(target, port):
         return None
 
 def save_results(target, open_ports, filename="scan_results.txt"):
-    """Save scan results to file"""
     with open(filename, 'w') as f:
         f.write(f"Port Scan Results for {target}\n")
         f.write(f"Scan Time: {datetime.now()}\n")
@@ -98,7 +93,6 @@ def scan_with_progress(target, port_range):
     return open_ports
 
 def scan_ip_range(ip_base, start, end, port):
-    """Scan multiple IPs for a specific port"""
     print(f"[*] Scanning {ip_base}.{start}-{end} on port {port}")
     live_hosts = []
     
@@ -117,7 +111,6 @@ def scan_ip_range(ip_base, start, end, port):
     return live_hosts
 
 def advanced_scanner():
-    """Complete scanner with all features"""
     print("=" * 60)
     print("ADVANCED PORT SCANNER")
     print("=" * 60)
