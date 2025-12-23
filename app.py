@@ -9,8 +9,9 @@ def index():
         ip = request.form.get("ip")
 
     return render_template("index.html", ip=ip)
-return "<h1>Network Scanner Interface </h1><p>Web interface is working. </p>"
+return "<h1>Network Scanner Interface </h1><p>Web interface is working. </p><p>To be continued </p>"
 
 if __name__ == "__main__":
 
     app.run(debug=True)
+
