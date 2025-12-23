@@ -1,3 +1,4 @@
+Add minimal Flask web interface with IP input
 ## Advanced Port Scanner
 
 A multi-threaded TCP port scanner written in Python for educational purposes.
