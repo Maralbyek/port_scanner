@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Port Scanner</title>
+    </head>
+    <body>
+        <h1>Port Scanner (Web)</h1>
+
+        <form method="post">
+            <input type="text" name="ip" placeholder="Enter IP address" required>
+            <button type="submit">Submit</button>
+        </form>
+
+        {% if ip &}
+           <p>You entered: <strong>{{ ip }}</strong></p>
+
+        {% endif %}   
+    </body>
+</html>
