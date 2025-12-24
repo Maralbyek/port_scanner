@@ -1,6 +1,14 @@
-<form method="post">
-    <input type="text" name="ip" placeholder="Enter IP address" required>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Scanner</title>
+</head>
+<body>
 
+<h1>Network Scanner Interface</h1>
+
+<form method="post">
+    <input type="text" name="ip" placeholder="Target IP" required>
     <br><br>
 
     <label>Scan Type:</label>
@@ -12,15 +20,20 @@
 
     <br><br>
 
-    <input type="text" name="ports" placeholder="Port range (e.g. 1-1024)">
-
+    <input type="text" name="ports" placeholder="Ports (e.g. 1-1024)">
     <br><br>
 
     <button type="submit">Submit</button>
 </form>
 
 {% if ip %}
-    <p><b>IP:</b> {{ ip }}</p>
-    <p><b>Scan Type:</b> {{ scan_type }}</p>
-    <p><b>Ports:</b> {{ ports }}</p>
+<hr>
+<p><b>IP:</b> {{ ip }}</p>
+<p><b>Scan Type:</b> {{ scan_type }}</p>
+<p><b>Ports:</b> {{ ports }}</p>
 {% endif %}
+
+<p><i>To be continued…</i></p>
+
+</body>
+</html>
