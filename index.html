@@ -1,19 +1,26 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Port Scanner</title>
-    </head>
-    <body>
-        <h1>Port Scanner (Web)</h1>
+<form method="post">
+    <input type="text" name="ip" placeholder="Enter IP address" required>
 
-        <form method="post">
-            <input type="text" name="ip" placeholder="Enter IP address" required>
-            <button type="submit">Submit</button>
-        </form>
+    <br><br>
 
-        {% if ip &}
-           <p>You entered: <strong>{{ ip }}</strong></p>
+    <label>Scan Type:</label>
+    <select name="scan_type">
+        <option value="tcp">TCP Scan</option>
+        <option value="common">Common Ports</option>
+        <option value="custom">Custom Range</option>
+    </select>
 
-        {% endif %}   
-    </body>
-</html>
+    <br><br>
+
+    <input type="text" name="ports" placeholder="Port range (e.g. 1-1024)">
+
+    <br><br>
+
+    <button type="submit">Submit</button>
+</form>
+
+{% if ip %}
+    <p><b>IP:</b> {{ ip }}</p>
+    <p><b>Scan Type:</b> {{ scan_type }}</p>
+    <p><b>Ports:</b> {{ ports }}</p>
+{% endif %}
