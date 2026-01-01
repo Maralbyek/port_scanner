@@ -1,80 +1,75 @@
 import socket
 import threading
 import sys
+import time
+
+open_ports = []
+lock = threading.Lock()
 
 
-def threaded_scan(target, port, results, lock):
+def scan_port(target, port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(0.5)
         result = sock.connect_ex((target, port))
+        sock.close()
+
         if result == 0:
             with lock:
-                results.append(port)
-        sock.close()
+                open_ports.append(port)
+
     except:
         pass
 
 
-def fast_scan(target, port_range):
-    print(f"[*] Starting fast scan on {target}")
+def threaded_scan(target, start_port, end_port):
     threads = []
-    results = []
-    lock = threading.Lock()
 
-    for port in port_range:
-        t = threading.Thread(
-            target=threaded_scan,
-            args=(target, port, results, lock)
-        )
+    print(f"[*] Scanning {target} from port {start_port} to {end_port}")
+
+    start_time = time.time()
+
+    for port in range(start_port, end_port + 1):
+        t = threading.Thread(target=scan_port, args=(target, port))
         threads.append(t)
         t.start()
 
     for t in threads:
         t.join()
 
-    return sorted(results)
+    end_time = time.time()
+
+    print("\nScan completed.")
+    print(f"Time taken: {end_time - start_time:.2f} seconds")
+
+    if open_ports:
+        print("\nOpen ports:")
+        for port in sorted(open_ports):
+            print(f" - Port {port}")
+    else:
+        print("\nNo open ports found.")
 
 
-def scan_with_progress(target, port_range):
-    total = len(port_range)
-    open_ports = []
+def main():
+    if len(sys.argv) != 4:
+        print("Usage: python port_scanner.py <target> <start_port> <end_port>")
+        sys.exit(1)
 
-    for i, port in enumerate(port_range, 1):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.5)
-        result = sock.connect_ex((target, port))
+    target = sys.argv[1]
 
-        if result == 0:
-            open_ports.append(port)
+    try:
+        start_port = int(sys.argv[2])
+        end_port = int(sys.argv[3])
+    except ValueError:
+        print("Ports must be integers.")
+        sys.exit(1)
 
-        sock.close()
+    if start_port < 1 or end_port > 65535 or start_port > end_port:
+        print("Invalid port range.")
+        sys.exit(1)
 
-        progress = (i / total) * 100
-        bar = int(progress / 2)
-        sys.stdout.write(
-            f"\r[{'=' * bar}{' ' * (50 - bar)}] {progress:.1f}%"
-        )
-        sys.stdout.flush()
-
-    print()
-    return open_ports
+    threaded_scan(target, start_port, end_port)
 
 
-def scan_ip_range(ip_base, start, end, port):
-    print(f"[*] Scanning {ip_base}.{start}-{end} on port {port}")
-    live_hosts = []
-
-    for i in range(start, end + 1):
-        target = f"{ip_base}.{i}"
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.3)
-        result = sock.connect_ex((target, port))
-
-        if result == 0:
-            print(f"[+] {target}:{port} is OPEN")
-            live_hosts.append(target)
-
-        sock.close()
-
-    return live_hosts
+if __name__ == "__main__":
+    main()
