@@ -2,14 +2,20 @@ from datetime import datetime
 
 
 def save_results(target, open_ports, filename="scan_results.txt"):
-    with open(filename, "w") as f:
-        f.write(f"Port Scan Results for {target}\n")
-        f.write(f"Scan Time: {datetime.now()}\n")
-        f.write("=" * 50 + "\n\n")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        for port in open_ports:
-            f.write(f"Port {port}: OPEN\n")
+    with open(filename, "a") as f:
+        f.write(f"Port Scan Results for: {target}\n")
+        f.write(f"Scan Time: {timestamp}\n")
+        f.write("-" * 50 + "\n")
 
-        f.write(f"\nTotal Open Ports: {len(open_ports)}\n")
+        if open_ports:
+            for port in sorted(open_ports):
+                f.write(f"Port {port:<5} : OPEN\n")
+        else:
+            f.write("No open ports found.\n")
 
-    print(f"[+] Results saved to {filename}")
+        f.write("-" * 50 + "\n")
+        f.write(f"Total Open Ports: {len(open_ports)}\n\n")
+
+    print(f"[+] Scan results saved to '{filename}'")
