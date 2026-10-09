@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PortWatch | Network reconnaissance dashboard</title>
+    <style>
+        :root { color-scheme: dark; --bg: #08111f; --panel: #101d31; --line: #243a57; --text: #e8f0fb; --muted: #8ea3bd; --accent: #54d6b2; --danger: #ff7c8d; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: radial-gradient(circle at top right, #163452, var(--bg) 45%); color: var(--text); font: 15px/1.5 Inter, system-ui, sans-serif; }
+        .shell { max-width: 1120px; margin: auto; padding: 42px 22px 64px; }
+        header { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 34px; }
+        .eyebrow { color: var(--accent); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
+        h1 { margin: 7px 0; font-size: clamp(30px, 5vw, 52px); letter-spacing: -.04em; }
+        .subtle, .hint { color: var(--muted); }
+        .badge { border: 1px solid #31516e; border-radius: 999px; padding: 8px 12px; color: var(--muted); white-space: nowrap; }
+        .panel { background: rgba(16, 29, 49, .88); border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 18px 50px rgba(0,0,0,.18); }
+        form { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 14px; align-items: end; }
+        label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 7px; }
+        input, select, button { width: 100%; border: 1px solid #34506e; border-radius: 9px; background: #0b1728; color: var(--text); padding: 12px 13px; font: inherit; }
+        input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+        button { background: var(--accent); color: #062019; border: 0; font-weight: 800; cursor: pointer; min-width: 118px; }
+        button:hover { filter: brightness(1.08); }
+        .notice { margin: 18px 0 0; padding: 12px 14px; border-radius: 9px; background: rgba(255,124,141,.1); color: var(--danger); }
+        .results { margin-top: 25px; display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .metric { font-size: 42px; font-weight: 800; color: var(--accent); margin: 5px 0; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 13px 8px; border-bottom: 1px solid var(--line); }
+        th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+        .open { color: var(--accent); font-weight: 700; }
+        .empty { color: var(--muted); padding: 16px 0 2px; }
+        footer { color: var(--muted); font-size: 12px; margin-top: 28px; }
+        @media (max-width: 800px) { form, .results { grid-template-columns: 1fr; } header { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<main class="shell">
+    <header>
+        <div>
+            <div class="eyebrow">PortWatch / reconnaissance</div>
+            <h1>Network visibility, at a glance.</h1>
+            <div class="subtle">Discover listening TCP services on systems you are authorized to assess.</div>
+        </div>
+        <div class="badge">TCP scanner online</div>
+    </header>
+
+    <section class="panel">
+        <form method="post">
+            <div>
+                <label for="ip">Target host</label>
+                <input id="ip" name="ip" value="{{ target }}" placeholder="192.168.1.1 or hostname" required>
+            </div>
+            <div>
+                <label for="scan_type">Scan profile</label>
+                <select id="scan_type" name="scan_type">
+                    <option value="common" {% if scan_type == "common" %}selected{% endif %}>Common ports</option>
+                    <option value="custom" {% if scan_type == "custom" %}selected{% endif %}>Custom range</option>
+                    <option value="full" {% if scan_type == "full" %}selected{% endif %}>Ports 1–1000</option>
+                </select>
+            </div>
+            <div>
+                <label for="ports">Custom range</label>
+                <input id="ports" name="ports" value="{{ ports }}" placeholder="e.g. 1-1024">
+            </div>
+            <button type="submit">Start scan</button>
+        </form>
+        <div class="hint">Common profile checks {{ 13 }} frequently used ports. Custom scans are limited to 2,000 ports.</div>
+        {% if error %}<div class="notice" role="alert">{{ error }}</div>{% endif %}
+    </section>
+
+    {% if duration is not none %}
+    <section class="results">
+        <div class="panel">
+            <div class="eyebrow">Latest scan</div>
+            <div class="metric">{{ results|length }}</div>
+            <div class="subtle">open ports on <strong>{{ target }}</strong></div>
+            <p class="subtle">Completed in {{ "%.2f"|format(duration) }} seconds.</p>
+        </div>
+        <div class="panel table-wrap">
+            <div class="eyebrow">Service inventory</div>
+            {% if results %}
+            <table>
+                <thead><tr><th>Port</th><th>State</th><th>Detected service</th></tr></thead>
+                <tbody>{% for item in results %}<tr><td>{{ item.port }}</td><td class="open">OPEN</td><td>{{ item.service }}</td></tr>{% endfor %}</tbody>
+            </table>
+            {% else %}<p class="empty">No open ports were found in the selected range.</p>{% endif %}
+        </div>
+    </section>
+    {% endif %}
+    <footer>Only scan hosts and networks where you have explicit permission. Results are generated locally by this application.</footer>
+</main>
+</body>
+</html>

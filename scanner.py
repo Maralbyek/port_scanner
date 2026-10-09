@@ -3,48 +3,50 @@ import threading
 import sys
 import time
 
-open_ports = []
-lock = threading.Lock()
-
-
-def scan_port(target, port):
+def scan_port(target, port, timeout=0.5):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.5)
+        sock.settimeout(timeout)
         result = sock.connect_ex((target, port))
         sock.close()
-
-        if result == 0:
-            with lock:
-                open_ports.append(port)
-
+        return port if result == 0 else None
     except:
-        pass
+        return None
 
 
-def threaded_scan(target, start_port, end_port):
+def scan_ports(target, ports, timeout=0.5):
+    open_ports = []
+    lock = threading.Lock()
     threads = []
 
-    print(f"[*] Scanning {target} from port {start_port} to {end_port}")
+    def scan_and_collect(port):
+        result = scan_port(target, port, timeout)
+        if result is not None:
+            with lock:
+                open_ports.append(result)
 
-    start_time = time.time()
-
-    for port in range(start_port, end_port + 1):
-        t = threading.Thread(target=scan_port, args=(target, port))
+    for port in ports:
+        t = threading.Thread(target=scan_and_collect, args=(port,))
         threads.append(t)
         t.start()
 
     for t in threads:
         t.join()
 
-    end_time = time.time()
+    return sorted(open_ports)
+
+
+def threaded_scan(target, start_port, end_port):
+    print(f"[*] Scanning {target} from port {start_port} to {end_port}")
+    start_time = time.time()
+    open_ports = scan_ports(target, range(start_port, end_port + 1))
 
     print("\nScan completed.")
-    print(f"Time taken: {end_time - start_time:.2f} seconds")
+    print(f"Time taken: {time.time() - start_time:.2f} seconds")
 
     if open_ports:
         print("\nOpen ports:")
-        for port in sorted(open_ports):
+        for port in open_ports:
             print(f" - Port {port}")
     else:
         print("\nNo open ports found.")
