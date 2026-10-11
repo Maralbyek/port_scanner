@@ -27,6 +27,16 @@ The dashboard uses the bundled PortWatch 3D network-atlas interface in
 required to run the Flask application. The visual atlas is an illustration of
 the current scan; it does not claim to discover physical network topology.
 
+### Dashboard screenshots
+
+#### Network topology
+
+![PortWatch network topology](docs/images/portwatch-topology.png)
+
+#### Scan dashboard
+
+![PortWatch scan dashboard](docs/images/portwatch-scan-dashboard.png)
+
 ## Usage
 ```bash
 python main.py
